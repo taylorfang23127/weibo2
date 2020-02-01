@@ -17,19 +17,21 @@ class SessionController extends Controller
     public function store(Request $request)
     {   //先将用户传过来的数据验证是否符合正常的规则
         $credentials = $this->validate($request,[
-            'email' => 'required|email|max;255',
+            'email' => 'required|email|max:255',
             'password'=>'required'
         ]);
-        return;
 
     //如果第一步验证通过,数据用Auth::attempt方法将传过来的数据拿去和数据库进行去比对
     if (Auth::attempt($credentials))
      {
             # code...登录后的相关操作
+        session()->flash('success','欢迎回来');
+        return redirect()->route('users.show',[Auth::user()]);
 
         }else{
             //登陆失败后的相关操作
-
+            session()->flash('dange','很抱歉,您的邮箱和密码不匹配');
+            return redirect()->back()->withInput();
         }
         return;
     }
