@@ -51,6 +51,35 @@ class UserController extends Controller
     }
 
 
+    public function edit(User $user)
+    {
+        return view('users.edit',compact('user'));
+
+
+    }
+
+
+    public function update(User $user, Request $request)
+    {   //在这里是验证了数据
+        $this->validate($request,[
+            'name' => 'required|max:50',
+            'password' => 'required|confirmed|min:6']);
+
+        //准备一个空数组
+        $date = [];
+        //接收用户可能更改后的名字数据
+        $data['name'] = $request->name;
+        //如果数据里有更新后的密码,直接把密码和可能更新后的名字一起更改
+        if($request->password){
+           $data['password'] = bcrypt($request->password);
+
+        //更新之后给的提示
+            session()->flash('success','个人资料更新成功');
+        $user->update($data);
+
+        return redirect()->route('users.show',$user->id);
+        }
+    }
 
 }
 
