@@ -9,7 +9,7 @@
     </div>
     <div class="card-body">
       @include('shared._errors')
-{{-- 使用post提交方式,条道post所对应的store方法上--}}
+
       <form method="POST" action="{{ route('login') }}">
           {{ csrf_field() }}
 
@@ -21,6 +21,13 @@
           <div class="form-group">
             <label for="password">密码：</label>
             <input type="password" name="password" class="form-control" value="{{ old('password') }}">
+          </div>
+
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" name="remember" id="exampleCheck1">
+              <label class="form-check-label" for="exampleCheck1">记住我</label>
+            </div>
           </div>
 
           <button type="submit" class="btn btn-primary">登录</button>

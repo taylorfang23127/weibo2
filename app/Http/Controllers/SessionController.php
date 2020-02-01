@@ -22,7 +22,7 @@ class SessionController extends Controller
         ]);
 
     //如果第一步验证通过,数据用Auth::attempt方法将传过来的数据拿去和数据库进行去比对
-    if (Auth::attempt($credentials))
+    if (Auth::attempt($credentials,$request->has('remember')))
      {
             # code...登录后的相关操作
         session()->flash('success','欢迎回来');
