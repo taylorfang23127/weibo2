@@ -8,6 +8,21 @@ use App\Models\User;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {    //使用laravel提供的身份认证auth中间件来过滤未登录的用户的edit,在
+        $this->middleware('auth',[
+            'except' =>['show','create','store']
+        ]);
+
+
+        $this->middleware('guest',
+            ['only' =>['create']]);
+
+}
+
+
+
+
     //
     public function create()
     {
@@ -51,8 +66,10 @@ class UserController extends Controller
     }
 
 
+
     public function edit(User $user)
     {
+        $this->authorize('update',$user);
         return view('users.edit',compact('user'));
 
 
@@ -60,7 +77,14 @@ class UserController extends Controller
 
 
     public function update(User $user, Request $request)
-    {   //在这里是验证了数据
+    {
+
+        $this->authorize('update',$user);
+
+
+
+
+    //在这里是验证了数据
         $this->validate($request,[
             'name' => 'required|max:50',
             'password' => 'required|confirmed|min:6']);

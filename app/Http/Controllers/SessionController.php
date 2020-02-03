@@ -8,7 +8,16 @@ use Auth;
 
 class SessionController extends Controller
 {
-    //
+    public function __construct()
+    {
+        $this->middleware('guest',
+            ['only' =>['create']]);
+    }
+
+
+
+
+
     public function create()
     {
         return view('sessions.create');
@@ -26,7 +35,8 @@ class SessionController extends Controller
      {
             # code...登录后的相关操作
         session()->flash('success','欢迎回来');
-        return redirect()->route('users.show',[Auth::user()]);
+        $fallback = route('users.show',Auth::user());
+        return redirect()->intended($fallback);
 
         }else{
             //登陆失败后的相关操作
