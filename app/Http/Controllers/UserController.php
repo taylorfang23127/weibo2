@@ -11,15 +11,19 @@ class UserController extends Controller
     public function __construct()
     {    //使用laravel提供的身份认证auth中间件来过滤未登录的用户的edit,在
         $this->middleware('auth',[
-            'except' =>['show','create','store']
+            'except' =>['show','create','store','index']
         ]);
 
 
         $this->middleware('guest',
             ['only' =>['create']]);
 
-}
-
+    }
+    public function index()
+    {
+        $users = User::paginate(6);
+        return view('users.index',compact('users'));
+    }
 
 
 
