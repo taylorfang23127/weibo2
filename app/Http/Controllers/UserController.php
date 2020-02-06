@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\User;
+use Mail;
+
 
 class UserController extends Controller
 {
     public function __construct()
     {    //使用laravel提供的身份认证auth中间件来过滤未登录的用户的edit,在
         $this->middleware('auth',[
-            'except' =>['show','create','store','index']
+            'except' =>['show','create','store','index','confirmEmail']
         ]);
 
 
@@ -57,9 +59,9 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
-        //第一个是会话的键,第二个为会话的值.
-        //下次如若再使用的
-        session()->flash('sussecss','欢迎,你将在这里开启一段新的旅程');
+        $this->sendEmailConfirmationTo($user);
+        session()->flash('success','验证邮件已经发到您的邮箱,请注意查收');
+        return redirect('/');
 
 //user::create()创建成功后会返回一个用户对象,并包含新注册用户的所有信息,我们将新注册用户的所有信息赋值给变量$user,并通过路由跳转来进行数据绑定
         //数据绑定什么值得看一看
@@ -115,6 +117,40 @@ class UserController extends Controller
         session()->flash('success','成功删除用户!');
         return back();
     }
+
+
+
+
+
+    public function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = 'summer@example.com';
+        $name = 'summer';
+        $to = $user ->email;
+        $subject = '感谢注册weibo应用!请确认你的邮箱.';
+
+        Mail::send($view,$data,function($message)use($from,$name,$to,$subject)
+        {
+            $message->from($from,$name)->to($to)->subject($subject);
+        });
+    }
+
+
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token',$token)->firstOrFail();
+        $user->activated = true;
+        $user->activation_token = null;
+        $user->save();
+
+
+        $AUTH::login($user);
+        session()->flash('success','恭喜你,激活成功');
+        return redirect()->route('users.show',[$user]);
+    }
+
 
 }
 

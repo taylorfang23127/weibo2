@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 //这玩意使用了就不需要去使用mysql的查询语句去使用这些东西了,几乎就是直接用他自带的方法去让字段和数据库去匹配所有的东西;
 use Auth;
+//邮件类
 
 class SessionController extends Controller
 {
@@ -30,13 +31,21 @@ class SessionController extends Controller
             'password'=>'required'
         ]);
 
+
     //如果第一步验证通过,数据用Auth::attempt方法将传过来的数据拿去和数据库进行去比对
     if (Auth::attempt($credentials,$request->has('remember')))
      {
-            # code...登录后的相关操作
+        if (Auth::user()->activated) {
+               # 登录后的相关操作
         session()->flash('success','欢迎回来');
         $fallback = route('users.show',Auth::user());
         return redirect()->intended($fallback);
+
+        }else{
+            Auth::logout();
+            session()->flash('warning','你的账号未激活,请检查邮箱中的注册邮件进行激活.');
+            return redirect('/');
+            }
 
         }else{
             //登陆失败后的相关操作
